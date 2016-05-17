@@ -1,21 +1,23 @@
 import re
-import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
-
-webActions = {}
+from http.server import BaseHTTPRequestHandler
 
 
+# Beispielklasse für einen Handler, der eine Ausgabe liefert
+# (ist auch die minimale bauweise)
 class ActionHandler():
-    def handle(self, relativeUrl: str, postData: dict, headers: dict) -> str:
-        print("Default handler called :) (\"" + relativeUrl + "\")")
+    def handle(self, relativeurl: str, postdata: dict, headers: dict) -> str:
+        print("Default handler called :) (\"" + relativeurl + "\")")
         return "Default handler :)"
 
 
+# Beispielklasse, wie man mit "Templates arbeiten könnte"
+# file = datei
+# replacements = dict, wobei key = zu ersetzender text und value = neuer text
 class TemplateActionHandler(ActionHandler):
     file = ""
     replacements = {}
 
-    def handle(self, relativeUrl: str, postData: dict, headers: dict):
+    def handle(self, relativeurl: str, postdata: dict, headers: dict):
         f = open(self.file, 'r')
         o = f.read()
         for replacement in self.replacements:
@@ -23,24 +25,10 @@ class TemplateActionHandler(ActionHandler):
         return o
 
 
-class HalloSager(TemplateActionHandler):
-    file = "myFile.txt"
-    replacements = {"{{Name}}": "Max Mustermann"}
-
-
-webActions["^\/hallo$"] = HalloSager()
-
+# Muss eigentlich garnicht angefasst werden
 class WebRequestHandler(BaseHTTPRequestHandler):
     actions = {}
     defaultAction = ActionHandler()
-
-    # Fügt eine neue Action dem Webserver hinzu
-    # Beispiel (...).addAction("\/[a-zA-Z]+\/.*", myAction)
-    def addAction(self, url: str, action: ActionHandler):
-        if url in self.actions.keys():
-            print(url + " allready in actions!")
-        else:
-            self.actions[url] = action
 
     # Wird bei einem GET aufgerufen
     def do_GET(self):
@@ -67,14 +55,4 @@ class WebRequestHandler(BaseHTTPRequestHandler):
 # Erzeugt einen neuen Type "WebHandler", der die actions enthält
 # (wird von HTTPServer gebraucht)
 def createWebRequestHandler(actions):
-    return type('WebHandler', (WebRequestHandler,), {'actions': webActions})
-
-def run():
-    print("Starting Server on Prt 8081...")
-    serverAddress = ("127.0.0.1", 8081)
-    httpd = HTTPServer(serverAddress, createWebRequestHandler(webActions))
-    print("Running Server...")
-    threading.Thread(target=httpd.serve_forever).start()
-
-run()
-print("Yo")
+    return type('WebHandler', (WebRequestHandler,), {'actions': actions})

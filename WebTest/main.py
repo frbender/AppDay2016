@@ -1,39 +1,80 @@
+import re
+import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
+webActions = {}
+
+
+class ActionHandler():
+    def handle(self, relativeUrl: str, postData: dict, headers: dict) -> str:
+        print("Default handler called :) (\"" + relativeUrl + "\")")
+        return "Default handler :)"
+
+
+class TemplateActionHandler(ActionHandler):
+    file = ""
+    replacements = {}
+
+    def handle(self, relativeUrl: str, postData: dict, headers: dict):
+        f = open(self.file, 'r')
+        o = f.read()
+        for replacement in self.replacements:
+            o = o.replace(replacement, self.replacements[replacement])
+        return o
+
+
+class HalloSager(TemplateActionHandler):
+    file = "myFile.txt"
+    replacements = {"{{Name}}": "Max Mustermann"}
+
+
+webActions["^\/hallo$"] = HalloSager()
 
 class WebRequestHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        # Send response status code
-        self.send_response(200)
+    actions = {}
+    defaultAction = ActionHandler()
 
-        # Send headers
+    # Fügt eine neue Action dem Webserver hinzu
+    # Beispiel (...).addAction("\/[a-zA-Z]+\/.*", myAction)
+    def addAction(self, url: str, action: ActionHandler):
+        if url in self.actions.keys():
+            print(url + " allready in actions!")
+        else:
+            self.actions[url] = action
+
+    # Wird bei einem GET aufgerufen
+    def do_GET(self):
+        self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-        # Send message back to client
-        message = "Hello world!"
-        # Write content as utf-8 data
-        self.wfile.write(bytes(message, "utf8"))
+        output = ""
+        successful = False
+
+        for action in self.actions:
+            if re.match(action, self.path):
+                output = self.actions[action].handle(self.path, {}, self.headers)
+                successful = True
+                break
+
+        if not successful:
+            output = self.defaultAction.handle(self.path, {}, self.headers)
+
+        self.wfile.write(bytes(output, "utf8"))
         return
 
 
-a = [1, 2, 3, 4, 5]
-
-def reverse(x):
-    if len(x) == 0:
-        return []
-    a, b = (x[0], x[1:])
-    return reverse(b) + [a]
-
-print(reverse(a))
-
+# Erzeugt einen neuen Type "WebHandler", der die actions enthält
+# (wird von HTTPServer gebraucht)
+def createWebRequestHandler(actions):
+    return type('WebHandler', (WebRequestHandler,), {'actions': webActions})
 
 def run():
-    print("starting server...")
+    print("Starting Server on Prt 8081...")
     serverAddress = ("127.0.0.1", 8081)
-    httpd = HTTPServer(serverAddress, WebRequestHandler)
-    print("running server...")
-    httpd.serve_forever()
-
+    httpd = HTTPServer(serverAddress, createWebRequestHandler(webActions))
+    print("Running Server...")
+    threading.Thread(target=httpd.serve_forever).start()
 
 run()
+print("Yo")

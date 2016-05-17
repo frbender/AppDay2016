@@ -9,7 +9,6 @@ import WebTest.AppDayServer as AppDayServer
 # (\/ ist ein ge-escaptes / und ^ bzw. $ markieren anfang/ende vom string)
 webActions = {}
 
-
 # Beispiel für Ableitung unter Benutzung der Template-Klasse
 # => SEEEEEEEEEHR EINFACH um ausgaben zu erzeugen
 # siehe AppDayServer.py
@@ -20,6 +19,8 @@ class HalloSager(AppDayServer.TemplateActionHandler):
 
 # hinzufügen des Handlers
 webActions["^\/hallo$"] = HalloSager()
+# standart zum ausgeben von bildern bzw binärdateien
+webActions[".*\/[a-z A-Z]*\.jpg$"] = AppDayServer.BinaryActionHandler()
 
 
 def run():

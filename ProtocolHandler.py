@@ -28,7 +28,7 @@ class ProtocolHandler:
     def handle(self, message: str, sender: str):
         parts = message.split('\t')
         if not len(parts) in [3, 4]:
-            print("[ProtocolManager.handle] Handled Message is bad :( (\"{}\")".format(message))
+            print("[ProtocolManager.handle] <{}> Handled Message is bad :( (\"{}\")".format(self.pseudonym, message))
             return
         messageobject = ProtocolMessage(parts[0], parts[1], parts[2], parts[3], sender)
 
@@ -43,27 +43,33 @@ class ProtocolHandler:
         if not message.m_from in self.lookuptable:
             self.lookuptable[message.m_from] = message.m_sender
             print(
-                "[ProtocolManager.handleSubscribe] Added \"" + message.m_from + "\" <" + message.m_sender + "> to lookuptable")
+                "[ProtocolManager.handleSubscribe] <{}> Added \"".format(
+                    self.pseudonym) + message.m_from + "\" <" + message.m_sender + "> to lookuptable")
         else:
             print(
-                "[ProtocolManager.handleSubscribe] Recieved \"SUBSCRIBE\"-Message from \"" + message.m_from + "\" <" + message.m_sender + "> but already in lookuptable so I won't care")
+                "[ProtocolManager.handleSubscribe] <{}> Recieved \"SUBSCRIBE\"-Message from \"".format(
+                    self.pseudonym) + message.m_from + "\" <" + message.m_sender + "> but already in lookuptable so I won't care")
 
     def handleUnsubscribe(self, message: ProtocolMessage):
         if message.m_from in self.lookuptable:
             del self.lookuptable[message.m_from]
             print(
-                "[ProtocolManager.handleUnsubscribe] Removed \"" + message.m_from + "\" <" + message.m_sender + "> from lookuptable")
+                "[ProtocolManager.handleUnsubscribe] <{}> Removed \"".format(
+                    self.pseudonym) + message.m_from + "\" <" + message.m_sender + "> from lookuptable")
         else:
             print(
-                "[ProtocolManager.handleSubscribe] Recieved \"UNSUBSCRIBE\"-Message from \"" + message.m_from + "\" <" + message.m_sender + "> but not found in lookuptable so I won't care")
+                "[ProtocolManager.handleSubscribe] <{}> Recieved \"UNSUBSCRIBE\"-Message from \"".format(
+                    self.pseudonym) + message.m_from + "\" <" + message.m_sender + "> but not found in lookuptable so I won't care")
 
     def handleMessage(self, message: ProtocolMessage):
-        print("[ProtocolManager.handleMessage] Recieved \"MESSAGE\"-Message \"" + str(message) + "\"")
+        print("[ProtocolManager.handleMessage] <{}> Recieved \"MESSAGE\"-Message \"".format(self.pseudonym) + str(
+            message) + "\"")
         if message.m_to == self.pseudonym:
             self.communicationManager.handleNewMessage(message)
             return
         if message.m_to == "ALL":
-            print("[ProtocolManager.handleMessage] Recieved \"MESSAGE\"-Message for all \"" + str(message) + "\"")
+            print("[ProtocolManager.handleMessage] <{}> Recieved \"MESSAGE\"-Message for all \"".format(
+                self.pseudonym) + str(message) + "\"")
             for reciever in self.lookuptable:
                 if not reciever == message.m_from:
                     self.networtManager.send(self.lookuptable[reciever], str(

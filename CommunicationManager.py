@@ -22,21 +22,22 @@ class CommunicationManager:
         if not isMaster:
             self.recieveThread.start()
         print(
-            "[CommunicationManager.__init__] Created new CommunicationManager for pseudonym \"{}\" (isMaster={})".format(
-                pseudonym, isMaster))
+            "[CommunicationManager.__init__] <{}> Created new CommunicationManager for pseudonym \"{}\" (isMaster={})".format(
+                pseudonym, pseudonym, isMaster))
 
     def checkForNewPackets(self):
         while self.networkManager.isConnectionAlive():
             msg = self.networkManager.recv()
             if msg:  # Got new messages
                 self.protocolHandler.handle(msg, self.networkManager.addr[0])
-            time.sleep(1)
+            time.sleep(0.2)
 
     def handleNewRawMessage(self, messagetext, sender):
         self.protocolHandler.handle(messagetext, sender)
 
     def handleNewMessage(self, messagetext):
-        print("[CommunicationManager.handleNewMessage] Did receive new message (\"{}\")".format(messagetext))
+        print("[CommunicationManager.handleNewMessage] <{}> Did receive new message (\"{}\")".format(
+            self.protocolHandler.pseudonym, messagetext))
 
     def sendMessage(self, message, receiver):
         self.protocolHandler.sendMessage(message, receiver)
@@ -47,3 +48,4 @@ time.sleep(1)
 slave = CommunicationManager("SLAVE", False, "127.0.0.1", ("127.0.0.1", 50000))
 time.sleep(1)
 slave.sendMessage("Meine Nachricht", "MASTER")
+master.sendMessage("Hey :)", "SLAVE")

@@ -28,7 +28,7 @@ class ProtocolHandler:
     def handle(self, message: str, sender: str):
         parts = message.split('\t')
         if not len(parts) in [3, 4]:
-            print("message is not correct (\"" + message + "\")")
+            print("[ProtocolManager.handle] Handled Message is bad :( (\"{}\")".format(message))
             return
         messageobject = ProtocolMessage(parts[0], parts[1], parts[2], parts[3], sender)
 
@@ -42,26 +42,28 @@ class ProtocolHandler:
     def handleSubscribe(self, message: ProtocolMessage):
         if not message.m_from in self.lookuptable:
             self.lookuptable[message.m_from] = message.m_sender
-            print("added \"" + message.m_from + "\" <" + message.m_sender + "> to lookuptable!")
+            print(
+                "[ProtocolManager.handleSubscribe] Added \"" + message.m_from + "\" <" + message.m_sender + "> to lookuptable")
         else:
             print(
-                "recieved SUBSCRIBEmessage from \"" + message.m_from + "\" <" + message.m_sender + "> but already in lookuptable so I won't care")
+                "[ProtocolManager.handleSubscribe] Recieved \"SUBSCRIBE\"-Message from \"" + message.m_from + "\" <" + message.m_sender + "> but already in lookuptable so I won't care")
 
     def handleUnsubscribe(self, message: ProtocolMessage):
         if message.m_from in self.lookuptable:
             del self.lookuptable[message.m_from]
-            print("removed \"" + message.m_from + "\" <" + message.m_sender + "> from lookuptable!")
+            print(
+                "[ProtocolManager.handleUnsubscribe] Removed \"" + message.m_from + "\" <" + message.m_sender + "> from lookuptable")
         else:
             print(
-                "recieved UNSUBSCRIBEmessage from \"" + message.m_from + "\" <" + message.m_sender + "> but not found in lookuptable so I won't care")
+                "[ProtocolManager.handleSubscribe] Recieved \"UNSUBSCRIBE\"-Message from \"" + message.m_from + "\" <" + message.m_sender + "> but not found in lookuptable so I won't care")
 
     def handleMessage(self, message: ProtocolMessage):
-        print("recieved MESSAGEmessage (" + str(message) + ")")
+        print("[ProtocolManager.handleMessage] Recieved \"MESSAGE\"-Message \"" + str(message) + "\"")
         if message.m_to == self.pseudonym:
             self.communicationManager.handleNewMessage(message)
             return
         if message.m_to == "ALL":
-            print("recieved MESSAGEmessage for all (" + str(message) + ")")
+            print("[ProtocolManager.handleMessage] Recieved \"MESSAGE\"-Message for all \"" + str(message) + "\"")
             for reciever in self.lookuptable:
                 if not reciever == message.m_from:
                     self.networtManager.send(self.lookuptable[reciever], str(
@@ -74,7 +76,7 @@ class ProtocolHandler:
 
     def sendMessage(self, message, receiver):
         self.networtManager.send(self.masterip,
-                                 str(ProtocolMessage(receiver, self.pseudonym, "MESSAGE", message.m_content)))
+                                 str(ProtocolMessage(receiver, self.pseudonym, "MESSAGE", message)))
 
     def sendSubscribe(self, receiver):
         self.networtManager.send(self.masterip, str(ProtocolMessage(receiver, self.pseudonym, "SUBSCRIBE", "")))
@@ -84,7 +86,7 @@ class ProtocolHandler:
 
 
 # Beispiele für den ProtocolHandler
-ph = ProtocolHandler("Mein Pseudonym", object(), object(), "MASTER", "123.123.123.123")
+# ph = ProtocolHandler("Mein Pseudonym", object(), object(), "MASTER", "123.123.123.123")
 # 1: lokales Pseudonym -> is klar
 # 2: networkHandler -> muss "send(ip-adresse, nachricht)" bereitstellen
 # 3: communicationManager -> muss handleNewMessage(textmessage)

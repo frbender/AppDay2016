@@ -1,6 +1,18 @@
-import signal
+import socket
+import threading
 import socketserver
-import sys
+
+
+class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+    def handle(self):
+        data = str(self.request.recv(1024), 'ascii')
+        cur_thread = threading.current_thread()
+        response = bytes("{}: {}".format(cur_thread.name, data), 'ascii')
+        self.request.sendall(response)
+
+
+class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+    pass
 
 
 class ChatRequestHandler(socketserver.BaseRequestHandler):
@@ -18,17 +30,22 @@ class ChatRequestHandler(socketserver.BaseRequestHandler):
                 break
 
 
-def signalHandler(signal, frame):
-    global server
-    print("Closing because of kill")
-    server.shutdown()
-    sys.exit(0)
+class Server:
+    def __init__(self, addr : (str,int)):
+        try:
+            self.server = server = ThreadedTCPServer(addr, ThreadedTCPRequestHandler)
+            self.server_thread = threading.Thread(target=self.server.serve_forever)
+            self.server_thread.deamon = True
+            self.server_thread.start()
+            print("Server loop running in thread:", self.server_thread.name)
+        except socket.error:
+            print("Error in server.py: Server.__init__")
 
+    def shutdown_server(self):
+        self.server.shutdown()
 
-signal.signal(signal.SIGTERM, signalHandler)
-server = socketserver.ThreadingTCPServer(("", 50000), ChatRequestHandler)
+    def send(self):
+        pass
 
-try:
-    server.serve_forever()
-except KeyboardInterrupt:
-    server.shutdown()
+    def recv(self):
+        pass

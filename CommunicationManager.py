@@ -27,6 +27,9 @@ class CommunicationManager:
                 self.protocolHandler.handle(msg, self.networkManager.addr[0])
             time.sleep(0.2)
 
+    def handleNewRawMessage(self, messagetext, sender):
+        self.protocolHandler.handle(messagetext, sender)
+
     def handleNewMessage(self, messagetext):
         print("Whohooo got new message: \"{}\"".format(messagetext))
 

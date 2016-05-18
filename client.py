@@ -8,8 +8,8 @@ class Client():
         self.s.setblocking(False)
         try:
             self.s.connect((ip, 50000))
-        except:
-            pass
+        except socket.error:
+            print("Error in client.py: init")
 
     def send(self, ip : str, message : str) -> bool:
         try:
@@ -24,4 +24,4 @@ class Client():
             message = self.s.recv(2048)
             return message.decode()
         except socket.error:
-            return False
+            return ""

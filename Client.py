@@ -39,8 +39,12 @@ c.send(message="Hallo")
 time.sleep(1)
 c.send(message="noch eine Nachricht")
 time.sleep(1)
-c.send(message="")
-time.sleep(1)
-c.send(message="Und Tschüß")
-time.sleep(1)
-c.close()
+
+while True:
+    try:
+        nachricht = c.recv()
+        if nachricht != "":
+            print(nachricht)
+        time.sleep(1)
+    finally:
+        c.close()

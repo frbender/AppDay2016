@@ -1,6 +1,7 @@
 import socket
 import select
 import threading
+from time import sleep
 
 
 class Server(threading.Thread):
@@ -11,16 +12,16 @@ class Server(threading.Thread):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind(addr)
         self.server.listen(1)
+        self._stopme = threading.Event()
 
     def run(self):
-        global clients
         try:
-            while True:
-                lesen, schreiben, oob = select.select([server] + clients, [], [])
+            while not self.stopped():
+                lesen, schreiben, oob = select.select([self.server] + Server.clients, [], [], 0.5)
                 for sock in lesen:
-                    if sock is server:
-                        client, addr = server.accept()
-                        clients.append(client)
+                    if sock is self.server:
+                        client, addr = self.server.accept()
+                        self.clients.append(client)
                         print("Client {} verbunden".format(addr[0]))
                     else:
                         nachricht = sock.recv(1024)
@@ -30,14 +31,27 @@ class Server(threading.Thread):
                         else:
                             print("Verbindung zu {} beendet".format(ip))
                             sock.close()
-                            clients.remove(sock)
+                            Server.clients.remove(sock)
         finally:
-            for c in clients:
+            for c in Server.clients:
                 c.close()
-            server.close()
+            self.server.close()
+
+    def stop(self):
+        self._stopme.set()
+
+    def stopped(self):
+        return self._stopme.isSet()
 
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("", 50000))
-server.listen(1)
+s = Server(("",50000))
+s.setDaemon(True)
+s.start()
 
+eingabe = input("> ")
+while eingabe != "ende":
+    print("...")
+    sleep(1)
+
+s.stop()
+s.join()

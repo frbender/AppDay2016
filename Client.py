@@ -8,6 +8,7 @@ class Client():
         self.s.setblocking(False)
         try:
             self.s.connect((self.ip, 50000))
+            self.isAlive = True
         except socket.error as e:
             print("Error in Client.py: init   " + str(e))
 
@@ -26,7 +27,11 @@ class Client():
         except socket.error:
             return ""
 
+    def isConnectionAlive(self) -> bool:
+        return self.isAlive
+
     def close(self):
+        self.isAlive = False
         self.s.close()
 
 c = Client("127.0.0.1")

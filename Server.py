@@ -1,7 +1,6 @@
-import socket
 import select
+import socket
 import threading
-from time import sleep
 
 
 class Server(threading.Thread):
@@ -9,12 +8,13 @@ class Server(threading.Thread):
     senddict = dict()
     Lock = threading.Lock()
 
-    def __init__(self, addr : (str,int)):
+    def __init__(self, addr: (str, int), delegate):
         threading.Thread.__init__(self)
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind(addr)
         self.server.listen(1)
         self._stopme = threading.Event()
+        self.delegate = delegate
 
     def run(self):
         try:
@@ -31,6 +31,7 @@ class Server(threading.Thread):
                         ip = sock.getpeername()[0]
                         if nachricht:
                             print("[{}] {}".format(ip, nachricht.decode()))
+                            self.delegate.handleNewRawMessage(nachricht.decode(), ip)
                         else:
                             print("Verbindung zu {} beendet".format(ip))
                             sock.close()

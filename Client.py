@@ -7,8 +7,8 @@ class Client():
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setblocking(False)
         try:
-            self.s.connect(self.addr)
             self.isAlive = True
+            self.s.connect(self.addr)
         except socket.error as e:
             print("Error in Client.py: init   " + str(e))
 
@@ -23,9 +23,13 @@ class Client():
     def recv(self) -> str:
         try:
             message = self.s.recv(2048)
-            return message.decode()
-        except socket.error:
-            return ""
+            if not message:
+                self.close()
+            else:
+                return message
+        except socket.error as e:
+            #print(str(e))
+            return None
 
     def isConnectionAlive(self) -> bool:
         return self.isAlive
@@ -34,17 +38,16 @@ class Client():
         self.isAlive = False
         self.s.close()
 
-c = Client(("127.0.0.1",50000))
-c.send(message="Hallo")
-time.sleep(1)
-c.send(message="noch eine Nachricht")
-time.sleep(1)
-
-while True:
-    try:
-        nachricht = c.recv()
-        if nachricht != "":
-            print(nachricht)
-        time.sleep(1)
-    finally:
-        c.close()
+# c = Client(("127.0.0.1", 50000))
+#
+# try:
+#
+#     while c.isConnectionAlive():
+#         nachricht = c.recv()
+#         if nachricht:
+#             print(nachricht)
+#         time.sleep(1)
+# finally:
+#     print("Closing connection")
+#     if c.isConnectionAlive():
+#         c.close()

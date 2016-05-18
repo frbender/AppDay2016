@@ -3,6 +3,7 @@ from threading import Thread
 
 from Client import Client
 from ProtocolHandler import ProtocolHandler
+from Server2 import Server
 
 
 class CommunicationManager:
@@ -13,10 +14,13 @@ class CommunicationManager:
             self.networkManager = Client(addr)
             self.recieveThread = Thread(target=self.checkForNewPackets)
         else:
+            self.networkManager = Server(addr)
+            self.networkManager.delegate = self
             print(
                 "HOLY SHIT MOTHERF*CKER HERE SHOULD BE THE INIT-STUFF FOR THE INCREDIBLE SERVERCLASS OH YEAH VAGINA PENIS TOUCHDOOOOOWN")
 
         self.protocolHandler = ProtocolHandler(pseudonym, self.networkManager, self, masterip)
+        self.protocolHandler.networtManager = self.networkManager
         if not isMaster:
             self.recieveThread.start()
 

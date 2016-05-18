@@ -9,13 +9,14 @@ class ChatRequestHandler(socketserver.BaseRequestHandler):
         print("[{}] Verbindung hergestellt".format(addr))
 
         while True:
-            s = self.request.recv(1024)
+            s = self.request.recv
             if s:
                 # Hier sind die Daten gesendeten Daten verfügbar
                 print("[{}] {}".format(addr, s.decode()))
             else:
                 print("[{}] Verbindung geschlossen".format(addr))
                 break
+
 
 def signalHandler(signal, frame):
     global server

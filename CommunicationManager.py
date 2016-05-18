@@ -20,7 +20,7 @@ class CommunicationManager:
         while self.networkManager.isConnectionAlive():
             msg = self.networkManager.recv()
             if msg != "":  # Got new messages
-                self.protocolHandler.handle(msg, self.networkManager.ip)
+                self.protocolHandler.handle(msg, self.networkManager.addr[0])
             time.sleep(0.2)
 
     def handleNewMessage(self, messagetext):

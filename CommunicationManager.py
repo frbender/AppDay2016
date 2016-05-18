@@ -8,13 +8,17 @@ from ProtocolHandler import ProtocolHandler
 class CommunicationManager:
     def __init__(self, pseudonym="NPHAERTER", isMaster=False, masterip="123.123.123.123", addr=("foobar", 1337)):
         self.isMaster = isMaster
+
         if not isMaster:
             self.networkManager = Client(addr)
             self.recieveThread = Thread(target=self.checkForNewPackets)
         else:
             print(
                 "HOLY SHIT MOTHERF*CKER HERE SHOULD BE THE INIT-STUFF FOR THE INCREDIBLE SERVERCLASS OH YEAH VAGINA PENIS TOUCHDOOOOOWN")
+
         self.protocolHandler = ProtocolHandler(pseudonym, self.networkManager, self, masterip)
+        if not isMaster:
+            self.recieveThread.start()
 
     def checkForNewPackets(self):
         while self.networkManager.isConnectionAlive():
@@ -25,3 +29,6 @@ class CommunicationManager:
 
     def handleNewMessage(self, messagetext):
         print("Whohooo got new message: \"{}\"".format(messagetext))
+
+    def sendMessage(self, message, receiver):
+        self.protocolHandler.sendMessage(message, receiver)

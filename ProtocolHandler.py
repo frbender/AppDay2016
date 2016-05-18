@@ -62,6 +62,7 @@ class ProtocolHandler:
                     self.pseudonym) + message.m_from + "\" <" + message.m_sender + "> but not found in lookuptable so I won't care")
 
     def handleMessage(self, message: ProtocolMessage):
+        print("LOTABLE: " + str(self.lookuptable))
         print("[ProtocolManager.handleMessage] <{}> Recieved \"MESSAGE\"-Message \"".format(self.pseudonym) + str(
             message) + "\"")
         if message.m_to == self.pseudonym:

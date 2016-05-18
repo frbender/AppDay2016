@@ -1,7 +1,6 @@
-import socket
 import select
+import socket
 import threading
-from time import sleep
 
 
 class Server(threading.Thread):
@@ -9,7 +8,7 @@ class Server(threading.Thread):
     senddict = dict()
     Lock = threading.Lock()
 
-    def __init__(self, addr : (str,int)):
+    def __init__(self, addr: (str, int), delegate):
         threading.Thread.__init__(self)
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
@@ -18,6 +17,7 @@ class Server(threading.Thread):
         except socket.error as e:
             print("[Server.__init__] ERROR binding failed! Msg:", str(e))
         self._stopme = threading.Event()
+        self.delegate = delegate
 
     def run(self):
         try:
@@ -34,6 +34,7 @@ class Server(threading.Thread):
                         ip = sock.getpeername()[0]
                         if nachricht:
                             print("[Server.run.<recv>] {}: {}".format(ip, nachricht.decode()))
+                            self.delegate.handleNewRawMessage(nachricht.decode(), ip)
                         else:
                             sock.close()
                             Server.clients.remove(sock)

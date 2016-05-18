@@ -18,9 +18,9 @@ class Client():
     def send(self, ip = "", message = "") -> bool:
         try:
             self.s.sendall(bytes(message, encoding='utf-8'))
-            print("[Client.send] Message send")
+            print("[Client.send] Message send: \"{}\"".format(message))
             return True
-        except OSError:
+        except OSError as e:
             print("[Client.send] ERROR failed! Msg:", str(e))
             return False
 
@@ -32,7 +32,7 @@ class Client():
                 self.close()
                 return None
             else:
-                print("[Client.recv] Message receved")
+                print("[Client.recv] Message receved: \"{}\"".format(message.decode()))
                 return message.decode()
         except socket.error as e:
             #print(str(e))

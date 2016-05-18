@@ -12,7 +12,6 @@ class ProtocolMessage:
 
 class ProtocolHandler:
     pseudonym = "BLA"
-    master = "MASTEROFDESASTER"
     masterip = "123.123.123.123"
     lookuptable = {}
     networtManager = object()
@@ -60,12 +59,18 @@ class ProtocolHandler:
         print("recieved MESSAGEmessage (" + str(message) + ")")
         if message.m_to == self.pseudonym:
             self.communicationManager.handleNewMessage(message)
+            return
         if message.m_to == "ALL":
             print("recieved MESSAGEmessage for all (" + str(message) + ")")
             for reciever in self.lookuptable:
                 if not reciever == message.m_from:
                     self.networtManager.send(self.lookuptable[reciever], str(
                         ProtocolMessage(reciever, self.pseudonym, "MESSAGE", message.m_content)))
+            return
+        if message.m_to in self.lookuptable:
+            self.networtManager.send(self.lookuptable[message.m_to],
+                                     str(ProtocolMessage(message.m_to, self.pseudonym, "MESSAGE", message.m_content)))
+            return
 
     def sendMessage(self, message, receiver):
         self.networtManager.send(self.masterip,
@@ -77,4 +82,17 @@ class ProtocolHandler:
     def sendUnsubscribe(self, receiver):
         self.networtManager.send(self.masterip, str(ProtocolMessage(receiver, self.pseudonym, "SUBSCRIBE", "")))
 
-        # Beispiele
+
+# Beispiele für den ProtocolHandler
+ph = ProtocolHandler("Mein Pseudonym", object(), object(), "MASTER", "123.123.123.123")
+# 1: lokales Pseudonym -> is klar
+# 2: networkHandler -> muss "send(ip-adresse, nachricht)" bereitstellen
+# 3: communicationManager -> muss handleNewMessage(textmessage)
+# 4: masterip -> ip des masters
+#
+# Benutzung
+# Muss von communicationManager erstellt werden. handle muss aufgerufen werden, sobald eine
+# neue nachricht vom server/client reinkommt. sendMessage kann von einem Client aufgerufen werden,
+# der an den Master senden will. auch der master kann das benutzen, indem er sozusagen eine nachricht
+# an sich selbst sendet sendMessage(message, "ALL") (->sendet an sich selbst nachricht, die dann an alle
+# verteilt wird)

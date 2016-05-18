@@ -1,6 +1,3 @@
-import sys
-
-
 class ProtocolMessage:
     def __init__(self, m_from="", m_to="", m_type="", m_content="", m_sender=""):
         self.m_from = m_from
@@ -14,17 +11,27 @@ class ProtocolMessage:
 
 
 class ProtocolHandler:
-    pseudonym = "MASTEROFDESASTER"
+    pseudonym = "BLA"
+    master = "MASTEROFDESASTER"
+    masterip = "123.123.123.123"
     lookuptable = {}
     networtManager = object()
     communicationManager = object()
 
+    def __init__(self, pseudonym, networkManager, communicationManager, masterip=""):
+        self.pseudonym = pseudonym
+        self.networtManager = networkManager
+        self.communicationManager = communicationManager
+        self.masterip = masterip
+
+    # message = raw message
+    # sender = ip address of sender of message
     def handle(self, message: str, sender: str):
         parts = message.split('\t')
-        if len(parts) != 4:
-            print("message is not correct (\"" + message + "\")", file=sys.stderr)
+        if not len(parts) in [3, 4]:
+            print("message is not correct (\"" + message + "\")")
             return
-        messageobject = ProtocolMessage(parts[0], parts[1], parts[2], parts[3])
+        messageobject = ProtocolMessage(parts[0], parts[1], parts[2], parts[3], sender)
 
         if messageobject.m_type == "SUBSCRIBE":
             self.handleSubscribe(messageobject)
@@ -59,3 +66,15 @@ class ProtocolHandler:
                 if not reciever == message.m_from:
                     self.networtManager.send(self.lookuptable[reciever], str(
                         ProtocolMessage(reciever, self.pseudonym, "MESSAGE", message.m_content)))
+
+    def sendMessage(self, message, receiver):
+        self.networtManager.send(self.masterip,
+                                 str(ProtocolMessage(receiver, self.pseudonym, "MESSAGE", message.m_content)))
+
+    def sendSubscribe(self, receiver):
+        self.networtManager.send(self.masterip, str(ProtocolMessage(receiver, self.pseudonym, "SUBSCRIBE", "")))
+
+    def sendUnsubscribe(self, receiver):
+        self.networtManager.send(self.masterip, str(ProtocolMessage(receiver, self.pseudonym, "SUBSCRIBE", "")))
+
+        # Beispiele

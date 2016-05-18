@@ -1,5 +1,5 @@
 import socket
-import time
+
 
 class Client():
     def __init__(self, addr : (str,int)):
@@ -26,7 +26,7 @@ class Client():
             if not message:
                 self.close()
             else:
-                return message
+                return message.decode()
         except socket.error as e:
             #print(str(e))
             return None

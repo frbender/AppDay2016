@@ -3,11 +3,11 @@ import time
 
 class Client():
     def __init__(self, addr : (str,int)):
-        self.ip = addr[0]
+        self.addr = addr
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setblocking(False)
         try:
-            self.s.connect((self.ip, 50000))
+            self.s.connect(self.addr)
             self.isAlive = True
         except socket.error as e:
             print("Error in Client.py: init   " + str(e))
@@ -34,7 +34,7 @@ class Client():
         self.isAlive = False
         self.s.close()
 
-c = Client("127.0.0.1")
+c = Client(("127.0.0.1",50000))
 c.send(message="Hallo")
 time.sleep(1)
 c.send(message="noch eine Nachricht")

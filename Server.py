@@ -7,7 +7,7 @@ class Server(threading.Thread):
     clients = []
     senddict = dict()
     Lock = threading.Lock()
-    debug = False;
+    debug = False
 
     def __init__(self, addr: (str, int), delegate):
         threading.Thread.__init__(self)

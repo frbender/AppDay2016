@@ -8,6 +8,7 @@ class MainClass:
     statements = {1: "Versammeln in 5 Minuten", 2: "Versammeln in 30 Minuten", 3: "Alle in den FSR-Raum",
                   4: "Neue Güterlieferung eingetroffen"}
     msgPointer = 0
+    readTo = 0
 
     def __init__(self):
         addr = ("", 50000)
@@ -15,7 +16,9 @@ class MainClass:
         self.messages = [ProtocolMessage("", "", "MESSAGE", "Keine weiteren Nachrichten")]
         self.root = Tk.Tk()
         w, h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-        self.root.overrideredirect(1)
+        # self.root.overrideredirect(1)
+        # self.root.state('normal')
+        self.root.attributes('-fullscreen', True)
         self.root.geometry("%dx%d+0+0" % (w, h))
         self.showNachricht("Mein Text")
 
@@ -24,7 +27,7 @@ class MainClass:
         self.left.pack()
         self.left.place(x=0, y=0, width=48, height=96)
 
-        font = ("Arial", 8, "normal")
+        font = ("Arial", 10, "normal")
 
         self.nachricht = Tk.Label(text=msgtext, font=font, wraplength=200)
         self.nachricht.pack()
@@ -53,6 +56,9 @@ class MainClass:
         self.textfield = Tk.Entry(bd=1)
         self.textfield.pack()
         self.textfield.place(x=0, y=240 - 32, width=320, height=32)
+        self.textfield.focus_set()
+        self.root.bind("<Return>", lambda x: self.sendCustom())
+
         # self.textfieldcontent = Tk.StringVar()
         # self.textfieldcontent.set("Nachricht eingeben")
         # self.textfield["textvariable"] = self.textfieldcontent
@@ -61,9 +67,16 @@ class MainClass:
 
         self.root.mainloop()
 
+    def sendCustom(self):
+        x = self.textfield.get()
+        print(x)
+        self.cmgr.sendMessage(x, "ALL")
+        self.textfield.delete(0, len(x))
+
     def btnClick(self, btnNumber):
         print(self.statements[btnNumber])
         self.cmgr.sendMessage(self.statements[btnNumber], "ALL")
+        self.textfield.focus_set()
         return
 
     def back(self):
@@ -74,14 +87,18 @@ class MainClass:
     def forth(self):
         if self.msgPointer < len(self.messages) - 1:
             self.msgPointer += 1
+            if self.msgPointer < self.readTo:
+                self.readTo = self.msgPointer
             self.updateLabel()
 
     def updateLabel(self):
-        self.nachricht["text"] = "[{}]: ".format(self.messages[self.msgPointer].m_from) + self.messages[
-            self.msgPointer].m_content
+        self.nachricht["text"] = "[{} {}/{}]: ".format(self.messages[self.msgPointer].m_from, self.msgPointer + 1,
+                                                       len(self.messages)) + self.messages[
+                                     self.msgPointer].m_content
 
     def addNewMessage(self, msg: ProtocolMessage):
         self.messages.append(msg)
+        self.updateLabel()
 
 
 main = MainClass()

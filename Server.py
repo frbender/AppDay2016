@@ -1,13 +1,14 @@
 import select
 import socket
 import threading
+import time
 
 
 class Server(threading.Thread):
     clients = []
     senddict = dict()
     Lock = threading.Lock()
-    debug = True
+    debug = False
 
     def __init__(self, addr: (str, int), delegate):
         threading.Thread.__init__(self)

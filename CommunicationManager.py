@@ -61,35 +61,3 @@ class CommunicationManager:
         if self.debug:
             print("[CommunicationManager.handleClockUpdate] <{}> Did receive clock update \"{}\")".format(
                 self.protocolHandler.pseudonym, clockupdate))
-
-
-try:
-    master = CommunicationManager("MASTER", True, "127.0.0.1", ("", 50000))
-
-    time.sleep(0.2)
-
-    bruno = CommunicationManager("BRUNO", False, "127.0.0.1", ("127.0.0.1", 50000))
-    borris = CommunicationManager("BORRIS", False, "127.0.0.1", ("127.0.0.1", 50000))
-
-    time.sleep(1)
-
-    bruno.subscribe("MASTER")
-    time.sleep(0.5)
-    borris.subscribe("MASTER")
-    time.sleep(0.5)
-
-    #    bruno.sendMessage("Meine Nachricht - in Liebe, Bruno", "MASTER")
-    #    time.sleep(0.1)
-
-    master.sendMessage("Hey :)", "ALL")
-    time.sleep(1)
-
-# master.sendClockUpdate("ALL", "13:37:42")
-#    time.sleep(1)
-
-#    borris.sendMessage("Meine Nachricht - in Liebe, Borris", "MASTER")
-except KeyboardInterrupt:
-    master.networkManager.stop()
-    bruno.networkManager.close()
-    borris.networkManager.close()
-    master.networkManager.join()

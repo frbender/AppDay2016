@@ -1,9 +1,12 @@
 import tkinter as Tk
-from tkinter import messagebox
+
+def ElementeEntfernen(root):
+    for widget in root.winfo_children():
+        widget.destroy()
 
 class UI_NavMain():
     def Anzeigen(Con: str):
-        mlist = Tk.Button(root, text = "ML", command=root.quit, relief = "solid")
+        mlist = Tk.Button(root, text = "ML", command=UI_NavMain.Entfernen, relief = "solid")
         mlist.pack()
         mlist.place(x=0, y=0, width=80, height=60)
         mwrite = Tk.Button(root, text = "MW", command=root.quit, relief = "solid")

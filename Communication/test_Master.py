@@ -1,6 +1,6 @@
 import time
 
-from CommunicationManager import CommunicationManager
+from Communication.CommunicationManager import CommunicationManager
 
 try:
     master = CommunicationManager("MASTER", True, "127.0.0.1", "MASTER", ("", 50000))

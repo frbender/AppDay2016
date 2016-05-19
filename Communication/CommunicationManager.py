@@ -1,9 +1,10 @@
 import time
 from threading import Thread
 
-from Client import Client
-from ProtocolHandler import ProtocolHandler
 from Server import Server
+
+from Communication.Client import Client
+from Communication.ProtocolHandler import ProtocolHandler
 
 
 class CommunicationManager:

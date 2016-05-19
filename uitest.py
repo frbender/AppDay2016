@@ -5,8 +5,8 @@ def ElementeEntfernen(root):
         widget.destroy()
 
 class UI_NavMain():
-    def Anzeigen(Con: str):
-        mlist = Tk.Button(root, text = "ML", command=UI_NavMain.Entfernen, relief = "solid")
+    def Anzeigen(root, Con: str):
+        mlist = Tk.Button(root, text="ML", command=root.quit, relief="solid")
         mlist.pack()
         mlist.place(x=0, y=0, width=80, height=60)
         mwrite = Tk.Button(root, text = "MW", command=root.quit, relief = "solid")
@@ -29,16 +29,19 @@ class UI_NavMain():
         topborder.create_text(225, 13, text=Con)
 
 class UI_NavMenu():
-    def Anzeigen(root, AktSeite : int, GesSeite : int , InfoText : str, Con : str):
-        back = Tk.Button(root, text = "<", command=root.quit, relief = "solid")
+    def __init__(self, main):
+        self.main = main
+
+    def Anzeigen(roots, AktSeite: int, GesSeite: int, InfoText: str, Con: str):
+        back = Tk.Button(roots, text="<", command=roots.quit, relief="solid")
         back.pack()
         back.place(x=0, y=0, width=80, height=60)
 
-        up = Tk.Button(root, text = "u", command=root.quit, relief = "solid")
+        up = Tk.Button(roots, text="u", command=roots.quit, relief="solid")
         up.pack()
         up.place(x=0, y=60, width=80, height=90)
 
-        down = Tk.Button(root, text = "D", command=root.quit, relief = "solid")
+        down = Tk.Button(roots, text="D", command=roots.quit, relief="solid")
         down.pack()
         down.place(x=0, y=150, width=80, height=90)
 
@@ -55,8 +58,12 @@ class UI_NavMenu():
         topborder.create_text(100, 13, text=InfoText)
         topborder.create_text(225, 13, text=Con)
 
+    def Hochscrollen(self):
+        self.main.scroll
+
+
 class UI_MainInfos():
-    def Anzeigen(Anzahl : int, InfoText : str):
+    def Anzeigen(root, Anzahl: int, InfoText: str):
         messages = Tk.Label(root, text = str(Anzahl) + " ungelesene Nachrichten\n\n" + InfoText, wraplength = 240)
         messages.pack()
         messages.place(x=80, y=28, width=240, height=115)
@@ -74,7 +81,7 @@ class UI_NachrichtenListe():
             elements[i].place(x=80, y=28 + (i * 71), width=240, height=71)
 
 class UI_NachrichtLesen():
-    def Anzeigen(From : str, Message : str):
+    def Anzeigen(root, From: str, Message: str):
         nachricht = Tk.Label(root, text=From + " schrieb:\n\n" + Message, justify = "left", anchor = "nw", wraplength=240)
         nachricht.pack()
         nachricht.place(x=80, y=28, width=240, height=215)

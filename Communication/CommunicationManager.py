@@ -7,8 +7,9 @@ from Communication.Server import Server
 
 
 class ServerCommunicationManager:
-    def __init__(self, addr: (str, int)):
+    def __init__(self, delegate, addr: (str, int)):
         self.server = Server(addr, self)
+        self.delegate = delegate
         self.protocolhandler = ServerProtocolHandler(self, self.server)
         self.server.start()
 
@@ -19,6 +20,7 @@ class ServerCommunicationManager:
         self.protocolhandler.handleMessage(ProtocolMessage("MASTER", receiver, "MESSAGE", messagestr))
 
     def handleMessageForMe(self, message: ProtocolMessage):
+        self.delegate.addNewMessage(message)
         print("Yay got new message: {}".format(str(message)))
 
 

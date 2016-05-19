@@ -2,12 +2,13 @@ import socket
 
 
 class Client():
-    debug = False
+    debug = True
 
     def __init__(self, addr : (str,int)):
         self.addr = addr
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setblocking(True)
+        self.isAlive = True
         try:
             self.s.connect(self.addr)
         except socket.error as e:

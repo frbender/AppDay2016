@@ -34,6 +34,7 @@ class ServerProtocolHandler:
         if message.m_from in self.lookuptable:
             print("already in table")
         else:
+            print("Add to table {}".format(message.m_from))
             self.lookuptable[message.m_from] = message.m_ip
 
     def handleUnsubscribe(self, message: ProtocolMessage):
@@ -57,6 +58,13 @@ class ServerProtocolHandler:
     def sendMessage(self, message):
         self.networkmanager.send(message.m_ip, str(message))
 
+    def sendMessageWithResolve(self, message, receiver):
+        if receiver in self.lookuptable:
+            self.networkmanager.send(self.lookuptable[receiver],
+                                     str(ProtocolMessage("MASTER", receiver, "MESSAGE", message)))
+        else:
+            print("receiver unknown ({})".format(receiver))
+
 
 class ClientProtocolHandler:
     def __init__(self, nickname, communicationmanager, networkmanager):
@@ -64,12 +72,12 @@ class ClientProtocolHandler:
         self.communicationmanager = communicationmanager
         self.networkmanager = networkmanager
 
-    def handle(self, messagestring: str, ip: str):
+    def handle(self, messagestring: str):
         parts = messagestring.split("\t")
         if len(parts) != 4:
             print("Wrong number of things in msg")
 
-        message = ProtocolMessage(parts[0], parts[1], parts[2], parts[3], ip)
+        message = ProtocolMessage(parts[0], parts[1], parts[2], parts[3], "")
 
         if message.m_type == "MESSAGE":
             self.handleMessage(message)
@@ -80,16 +88,16 @@ class ClientProtocolHandler:
         if message.m_to == self.nickname:
             self.communicationmanager.handleMessageForMe(message)
         else:
-            print("Message not for me")
+            print("Message not for me ({})".format(self.nickname))
 
     def sendMessage(self, message: str):
-        self.networkmanager.send(self.communicationmanager.master[0],
+        self.networkmanager.send(self.communicationmanager.master,
                                  str(ProtocolMessage(self.nickname, "MASTER", "MESSAGE", message)))
 
     def sendSubscribe(self):
-        self.networkmanager.send(self.communicationmanager.master[0],
+        self.networkmanager.send(self.communicationmanager.master,
                                  str(ProtocolMessage(self.nickname, "MASTER", "SUBSCRIBE", "_")))
 
     def sendUnsubscribe(self):
-        self.networkmanager.send(self.communicationmanager.master[0],
+        self.networkmanager.send(self.communicationmanager.master,
                                  str(ProtocolMessage(self.nickname, "MASTER", "UNSUBSCRIBE", "_")))

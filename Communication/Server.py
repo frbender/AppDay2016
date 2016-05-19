@@ -38,7 +38,7 @@ class Server(threading.Thread):
                         if nachricht:
                             if Server.debug:
                                 print("[Server.run.<recv>] {}: {}".format(ip, nachricht.decode()))
-                            self.delegate.handleNewRawMessage(nachricht.decode(), ip)
+                            self.delegate.handleIncommingMessage(nachricht.decode(), ip)
                         else:
                             sock.close()
                             Server.clients.remove(sock)

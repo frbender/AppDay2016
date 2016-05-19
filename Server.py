@@ -1,13 +1,13 @@
 import select
 import socket
 import threading
-
+import time
 
 class Server(threading.Thread):
     clients = []
     senddict = dict()
     Lock = threading.Lock()
-    debug = False;
+    debug = True
 
     def __init__(self, addr: (str, int), delegate):
         threading.Thread.__init__(self)
@@ -55,6 +55,7 @@ class Server(threading.Thread):
                 if len(Server.senddict) > 0:
                     print("[Server.run.<send>] WARN Not all messages send!")
                 Server.Lock.release()
+                time.sleep(0.05)
         finally:
             if Server.debug:
                 print("[Server.run.<finally>] Closing all clients")

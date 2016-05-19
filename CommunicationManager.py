@@ -8,7 +8,9 @@ from Server import Server
 
 class CommunicationManager:
     debug = True
-    def __init__(self, pseudonym="NPHAERTER", isMaster=False, masterip="123.123.123.123", addr=("foobar", 1337)):
+
+    def __init__(self, pseudonym="NPHAERTER", isMaster=False, masterip="123.123.123.123", mastername="MASTER",
+                 addr=("foobar", 1337)):
 
         self.isMaster = isMaster
 
@@ -19,7 +21,7 @@ class CommunicationManager:
             self.networkManager = Server(addr, self)
             self.networkManager.start()
 
-        self.protocolHandler = ProtocolHandler(pseudonym, self.networkManager, self, masterip)
+        self.protocolHandler = ProtocolHandler(pseudonym, self.networkManager, self, masterip, mastername)
         if not isMaster:
             self.recieveThread.start()
         if self.debug:
@@ -32,14 +34,14 @@ class CommunicationManager:
             msg = self.networkManager.recv()
             if msg:  # Got new messages
                 self.protocolHandler.handle(msg, self.networkManager.addr[0])
-            time.sleep(0.2)
+            time.sleep(0.05)
 
     def handleNewRawMessage(self, messagetext, sender):
         self.protocolHandler.handle(messagetext, sender)
 
     def handleNewMessage(self, messagetext):
-        if self.debug:
-            print("[CommunicationManager.handleNewMessage] <{}> Did receive new message (\"{}\")".format(
+        # if self.debug:
+        print("[CommunicationManager.handleNewMessage] <{}> Did receive new message (\"{}\")".format(
             self.protocolHandler.pseudonym, messagetext))
 
     def sendMessage(self, message, receiver):
@@ -64,32 +66,30 @@ class CommunicationManager:
 
 
 try:
-    master = CommunicationManager("MASTER", True, "127.0.0.1", ("", 50000))
-
-    time.sleep(0.2)
-
-    bruno = CommunicationManager("BRUNO", False, "127.0.0.1", ("127.0.0.1", 50000))
-    borris = CommunicationManager("BORRIS", False, "127.0.0.1", ("127.0.0.1", 50000))
+    master = CommunicationManager("MASTER", True, "127.0.0.1", "MASTER", ("", 50000))
 
     time.sleep(1)
 
-    bruno.subscribe("MASTER")
-    time.sleep(0.5)
+    borris = CommunicationManager("BORRIS", False, "127.0.0.1", "MASTER", ("127.0.0.1", 50000))
+
+    time.sleep(1)
+
     borris.subscribe("MASTER")
-    time.sleep(0.5)
 
-    #    bruno.sendMessage("Meine Nachricht - in Liebe, Bruno", "MASTER")
-    #    time.sleep(0.1)
-
-    master.sendMessage("Hey :)", "ALL")
     time.sleep(1)
 
-# master.sendClockUpdate("ALL", "13:37:42")
-#    time.sleep(1)
+    master.sendMessage("Hallo, hier ist Master", "ALL")
 
-#    borris.sendMessage("Meine Nachricht - in Liebe, Borris", "MASTER")
+    time.sleep(1)
+
+    #master.sendMessage("Moin Moin", "BORRIS")
+
+    # time.sleep(1)
+
+    borris.sendMessage("Meine Nachricht - in Liebe, Borris", "MASTER")
+
 except KeyboardInterrupt:
     master.networkManager.stop()
-    bruno.networkManager.close()
+    #bruno.networkManager.close()
     borris.networkManager.close()
     master.networkManager.join()

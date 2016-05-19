@@ -83,7 +83,8 @@ class UI_ImageTest():
     def Anzeigen():
         cv = Tk.Canvas(root)
         cv.pack()
-        img = Tk.PhotoImage(file="ressources\down.png")
+        img = Tk.PhotoImage(file="ressources\\up.gif")
+        cv.create_line(0, 3, 243, 3, width=1)  # Linie Oben
         cv.create_image(0,0, image=img, anchor="nw")
         cv.place(x=0, y=0, width=200, height=200)
 
@@ -121,7 +122,15 @@ root.geometry("%dx%d+0+0" % (w, h))
 #UI_NachrichtenListe.Anzeigen(3, "Master", "Hallo Welt1", "Slave1", "Eintrag 2", "Slave2", "Eintrag3")
 #UI_NachrichtLesen.Anzeigen("Master", "Hallo Team! Ich hoffe ihr kommt mit eurem Projekt voran und wir sehen uns gleich.")
 
-UI_ImageTest.Anzeigen()
+cv = Tk.Canvas(root)
+cv.pack()
+cv.place
+img = Tk.PhotoImage(file="ressources\\up.gif")
+cv.create_line(0, 3, 243, 3, width=1)  # Linie Oben
+cv.create_image(0, 0, image=img, anchor="nw")
+
+
+UI_ImageTest.Anzeigen
 
 #UI_NavMain.Anzeigen("ok")
 

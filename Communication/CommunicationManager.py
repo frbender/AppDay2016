@@ -21,16 +21,16 @@ class ServerCommunicationManager:
 
     def handleMessageForMe(self, message: ProtocolMessage):
         self.delegate.addNewMessage(message)
-        print("Yay got new message: {}".format(str(message)))
 
 
 class ClientCommunicationManager:
-    def __init__(self, addr: (str, int), nickname: str):
+    def __init__(self, delegate, addr: (str, int), nickname: str):
         self.client = Client(addr)
         self.protocolhandler = ClientProtocolHandler(nickname, self, self.client)
         self.clientChecker = Thread(target=self.clientChecker)
         self.clientChecker.start()
         self.master = addr[0]
+        self.delegate = delegate
 
     def clientChecker(self):
         while self.client.isConnectionAlive():
@@ -43,7 +43,7 @@ class ClientCommunicationManager:
         self.protocolhandler.sendMessage(messagestr)
 
     def handleMessageForMe(self, message: ProtocolMessage):
-        print("Yay got new message: {}".format(str(message)))
+        self.delegate.addNewMessage(message)
 
     def subscribe(self):
         self.protocolhandler.sendSubscribe()

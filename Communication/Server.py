@@ -3,13 +3,16 @@ import socket
 import threading
 import time
 
-
+# Multiplexender Server für den Master
 class Server(threading.Thread):
+    # Liste mit allen Clients
     clients = []
+    # Dict mit zu sendenden Nachrichten
     senddict = dict()
     Lock = threading.Lock()
-    debug = True
+    debug = False
 
+    # Läuft in eigeneme Thread
     def __init__(self, addr: (str, int), delegate):
         threading.Thread.__init__(self)
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,14 +22,18 @@ class Server(threading.Thread):
         except socket.error as e:
             print("[Server.__init__] ERROR binding failed! Msg:", str(e))
         self._stopme = threading.Event()
+        # Delegate zur Rückgabe
         self.delegate = delegate
 
     def run(self):
         try:
             while not self.stopped():
                 Server.Lock.acquire()
+                # Lesen enthät alle Sockets aus denen etwas gelesen werden kann, schreiben alle in die geschrieben werden kann
                 lesen, schreiben, oob = select.select([self.server] + Server.clients, Server.clients, [], 0.5)
+                # Lies alles was es zu lesen gibt
                 for sock in lesen:
+                    # Neue session
                     if sock is self.server:
                         client, addr = self.server.accept()
                         self.clients.append(client)
@@ -35,10 +42,12 @@ class Server(threading.Thread):
                     else:
                         nachricht = sock.recv(1024)
                         ip = sock.getpeername()[0]
+                        # Empfangen
                         if nachricht:
                             if Server.debug:
                                 print("[Server.run.<recv>] {}: {}".format(ip, nachricht.decode()))
                             self.delegate.handleIncommingMessage(nachricht.decode(), ip)
+                        # Socket schließen
                         else:
                             sock.close()
                             Server.clients.remove(sock)
@@ -46,6 +55,7 @@ class Server(threading.Thread):
                                 schreiben.remove(sock)
                             if Server.debug:
                                 print("[Server.run.<recv>] Connection with {} closed".format(ip))
+                # Schreibe senddict raus
                 for sock in schreiben:
                     ip = sock.getpeername()[0]
                     if ip in Server.senddict:

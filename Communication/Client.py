@@ -1,9 +1,10 @@
 import socket
 
-
+# Einfacher TCP-Client für die Slaves sockets im nonblocking Modus
 class Client():
-    debug = True
+    debug = False
 
+    # Konstruktor mit addr für Master
     def __init__(self, addr : (str,int)):
         self.addr = addr
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -20,6 +21,7 @@ class Client():
                 if Client.debug:
                     print("[Client.__init__] Connected")
 
+    #Senden von message Strings
     def send(self, ip = "", message = "") -> bool:
         try:
             self.s.sendall(bytes(message, encoding='utf-8'))
@@ -30,6 +32,7 @@ class Client():
             print("[Client.send] ERROR failed! Msg:", str(e))
             return False
 
+    #Empfangen von Strings, muss explizit aufgerufen werden -> ClientCommunicationManager
     def recv(self) -> str:
         try:
             message = self.s.recv(2048)
@@ -49,6 +52,7 @@ class Client():
     def isConnectionAlive(self) -> bool:
         return self.isAlive
 
+    #Socket schließen
     def close(self):
         self.isAlive = False
         try:

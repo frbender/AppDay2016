@@ -62,9 +62,6 @@ class MainClass:
         self.textfield.focus_set()
 
         self.root.bind("<Return>", lambda x: self.sendCustom())
-        # self.textfieldcontent = Tk.StringVar()
-        # self.textfieldcontent.set("Nachricht eingeben")
-        # self.textfield["textvariable"] = self.textfieldcontent
 
         self.updateLabel()
 

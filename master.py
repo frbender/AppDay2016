@@ -16,8 +16,6 @@ class MainClass:
         self.messages = [ProtocolMessage("", "", "MESSAGE", "Keine weiteren Nachrichten")]
         self.root = Tk.Tk()
         w, h = self.root.winfo_screenwidth(), self.root.winfo_screenheight()
-        # self.root.overrideredirect(1)
-        # self.root.state('normal')
         self.root.attributes('-fullscreen', True)
         self.root.geometry("%dx%d+0+0" % (w, h))
         self.showNachricht("Mein Text")
@@ -58,10 +56,6 @@ class MainClass:
         self.textfield.place(x=0, y=240 - 32, width=320, height=32)
         self.textfield.focus_set()
         self.root.bind("<Return>", lambda x: self.sendCustom())
-
-        # self.textfieldcontent = Tk.StringVar()
-        # self.textfieldcontent.set("Nachricht eingeben")
-        # self.textfield["textvariable"] = self.textfieldcontent
 
         self.updateLabel()
 

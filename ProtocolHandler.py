@@ -11,7 +11,7 @@ class ProtocolMessage:
 
 
 class ProtocolHandler:
-    debug = True
+    debug = False
     pseudonym = "BLA"
     masterip = "123.123.123.123"
     masterpsd = "123.123.123.123"

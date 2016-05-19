@@ -1,10 +1,9 @@
 import time
 from threading import Thread
 
-from Server import Server
-
 from Communication.Client import Client
 from Communication.ProtocolHandler import ProtocolHandler
+from Communication.Server import Server
 
 
 class CommunicationManager:
@@ -14,6 +13,7 @@ class CommunicationManager:
                  addr=("foobar", 1337)):
 
         self.isMaster = isMaster
+        self.mastername = mastername
 
         if not isMaster:
             self.networkManager = Client(addr)
@@ -49,7 +49,10 @@ class CommunicationManager:
         if self.debug:
             print("[CommunicationManager.sendMessage] <{}> Will send Message \"{}\" to \"{}\"".format(
                 self.protocolHandler.pseudonym, message, receiver))
-        self.protocolHandler.sendMessage(message, receiver)
+        if self.isMaster:
+            self.protocolHandler.sendMessage(message, receiver)
+        else:
+            self.protocolHandler.sendMessage(message, receiver, self.mastername)
 
     def subscribe(self, reciever):
         self.protocolHandler.sendSubscribe(reciever)

@@ -2,31 +2,25 @@ import time
 
 from Communication.CommunicationManager import CommunicationManager
 
+master = None
 try:
     master = CommunicationManager("MASTER", True, "127.0.0.1", "MASTER", ("", 50000))
 
-    time.sleep(1)
-
-    borris = CommunicationManager("BORRIS", False, "127.0.0.1", "MASTER", ("127.0.0.1", 50000))
-
-    time.sleep(1)
-
-    borris.subscribe("MASTER")
-
-    time.sleep(1)
+    while "FRANK" not in master.protocolHandler.lookuptable:
+        time.sleep(0.5)
+    while "ADRIAN" not in master.protocolHandler.lookuptable:
+        time.sleep(0.5)
 
     master.sendMessage("Hallo, hier ist Master", "ALL")
 
     time.sleep(1)
 
-    master.sendMessage("Moin Moin", "BORRIS")
+    master.sendMessage("Moin Moin", "ADRIAN")
 
     time.sleep(1)
 
-    borris.sendMessage("Meine Nachricht - in Liebe, Borris", "MASTER")
+    master.sendMessage("Moin Moin", "FRANK")
 
 except KeyboardInterrupt:
     master.networkManager.stop()
-    # bruno.networkManager.close()
-    borris.networkManager.close()
     master.networkManager.join()

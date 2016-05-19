@@ -7,7 +7,7 @@ class Client():
     def __init__(self, addr : (str,int)):
         self.addr = addr
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.setblocking(False)
+        self.s.setblocking(True)
         try:
             self.s.connect(self.addr)
         except socket.error as e:

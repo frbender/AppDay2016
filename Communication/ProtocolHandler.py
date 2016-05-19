@@ -71,11 +71,15 @@ class ProtocolHandler:
     def handleClockUpdate(self, message: ProtocolMessage):
         self.communicationManager.handleClockUpdate(message.m_content)
 
-    def handleMessage(self, message: ProtocolMessage):
+    def handleMessage(self, message: ProtocolMessage, via=None):
         if self.debug:
             print("[ProtocolManager.handleMessage] <{}> Recieved \"MESSAGE\"-Message (in general) \"".format(
                 self.pseudonym) + str(
             message) + "\"")
+        if via:
+            self.networtManager.send(self.lookuptable[via],
+                                     str(ProtocolMessage(message.m_from, message.m_to, "MESSAGE", message.m_content)))
+            return
         if message.m_to == self.pseudonym:
             self.communicationManager.handleNewMessage(message.m_content)
             return
@@ -95,9 +99,9 @@ class ProtocolHandler:
             self.networtManager.send(self.lookuptable[message.m_to],
                                      str(ProtocolMessage(message.m_from, message.m_to, "MESSAGE", message.m_content)))
 
-    def sendMessage(self, message, receiver):
+    def sendMessage(self, message, receiver, via=None):
         print("[ProtocolManager.sendMessage] <{}> Redirecting to handleMessage...".format(self.pseudonym))
-        self.handleMessage(ProtocolMessage(self.pseudonym, receiver, "MESSAGE", message))
+        self.handleMessage(ProtocolMessage(self.pseudonym, receiver, "MESSAGE", message), via)
 
     def sendSubscribe(self, receiver):
         if self.debug:

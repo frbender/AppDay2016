@@ -1,8 +1,7 @@
 import time
 from threading import Thread
 
-from Server import Server
-
+from Communication.Server import Server
 from Communication.Client import Client
 from Communication.ProtocolHandler import ProtocolHandler
 

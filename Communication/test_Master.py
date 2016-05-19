@@ -1,6 +1,6 @@
 import time
 
-from Communication.CommunicationManager import CommunicationManager
+from Communication.CommunicationManager_old import CommunicationManager
 
 master = None
 try:
@@ -20,6 +20,10 @@ try:
     time.sleep(1)
 
     master.sendMessage("Moin Moin", "FRANK")
+    time.sleep(0.5)
+
+    master.sendMessage("Hallo, hier ist noch ein Master", "ALL")
+
 
 except KeyboardInterrupt:
     master.networkManager.stop()

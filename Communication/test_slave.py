@@ -1,6 +1,6 @@
-from Communication.CommunicationManager import CommunicationManager
 from time import sleep
 
+from Communication.CommunicationManager_old import CommunicationManager
 
 frank = None
 adrian = None

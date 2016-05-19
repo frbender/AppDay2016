@@ -79,6 +79,14 @@ class UI_NachrichtLesen():
         nachricht.pack()
         nachricht.place(x=80, y=28, width=240, height=215)
 
+class UI_ImageTest():
+    def Anzeigen():
+        cv = Tk.Canvas(root)
+        cv.pack()
+        img = Tk.PhotoImage(file="ressources\down.png")
+        cv.create_image(0,0, image=img, anchor="nw")
+        cv.place(x=0, y=0, width=200, height=200)
+
 class UI_NachrichtSchreiben():
     def Anzeigen(Anzahl : int, Label1 : str, Label2 : str, Label3 : str, InfoText : str):
         elements = ["element1", "element2", "element3"]
@@ -107,11 +115,13 @@ w, h = root.winfo_screenwidth(), root.winfo_screenheight()
 root.overrideredirect(1)
 root.geometry("%dx%d+0+0" % (w, h))
 
-UI_NavMenu.Anzeigen(1, 2, "11.34:59", "ok")
+#UI_NavMenu.Anzeigen(1, 2, "11.34:59", "ok")
 #UI_NachrichtSchreiben.Anzeigen(3, "Ja", "Nein", "Egal", "Ja!!!!")
 #UI_MainInfos.Anzeigen(3, "23:12:55")
-UI_NachrichtenListe.Anzeigen(3, "Master", "Hallo Welt1", "Slave1", "Eintrag 2", "Slave2", "Eintrag3")
+#UI_NachrichtenListe.Anzeigen(3, "Master", "Hallo Welt1", "Slave1", "Eintrag 2", "Slave2", "Eintrag3")
 #UI_NachrichtLesen.Anzeigen("Master", "Hallo Team! Ich hoffe ihr kommt mit eurem Projekt voran und wir sehen uns gleich.")
+
+UI_ImageTest.Anzeigen()
 
 #UI_NavMain.Anzeigen("ok")
 

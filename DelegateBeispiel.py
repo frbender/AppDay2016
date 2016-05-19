@@ -9,15 +9,16 @@ class Klasse1:
 
 
 class Delegierter:
-    def doSomething(self):
+    def blub(self):
         print("TOLL")
 
 
 d = Delegierter()
+k = Klasse1()
 
-Klasse1.delegate = d
+k.delegate = d
 
-Klasse1.doSomethingCool()
+k.doSomethingCool()
 
 
 ###############################

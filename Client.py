@@ -11,12 +11,12 @@ class Client():
         try:
             self.s.connect(self.addr)
         except socket.error as e:
-            if e.errno != 36:
-                print("[Client.__init__] ERROR connect failed! Msg:", str(e))
-            else:
-                self.isAlive = True
-                if Client.debug:
-                    print("[Client.__init__] Connected")
+            #if e.errno != 36:
+            #    print("[Client.__init__] ERROR connect failed! Msg:", str(e))
+            #else:
+            self.isAlive = True
+            if Client.debug:
+                print("[Client.__init__] Connected")
 
     def send(self, ip = "", message = "") -> bool:
         try:

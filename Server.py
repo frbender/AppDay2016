@@ -1,7 +1,7 @@
 import select
 import socket
 import threading
-import time
+
 
 class Server(threading.Thread):
     clients = []

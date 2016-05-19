@@ -1,14 +1,16 @@
 import time
 from threading import Thread
 
-from Client import Client
-from ProtocolHandler import ProtocolHandler
-from Server import Server
+from Communication.Server import Server
+from Communication.Client import Client
+from Communication.ProtocolHandler import ProtocolHandler
 
 
 class CommunicationManager:
     debug = True
-    def __init__(self, pseudonym="NPHAERTER", isMaster=False, masterip="123.123.123.123", addr=("foobar", 1337)):
+
+    def __init__(self, pseudonym="NPHAERTER", isMaster=False, masterip="123.123.123.123", mastername="MASTER",
+                 addr=("foobar", 1337)):
 
         self.isMaster = isMaster
 
@@ -19,7 +21,7 @@ class CommunicationManager:
             self.networkManager = Server(addr, self)
             self.networkManager.start()
 
-        self.protocolHandler = ProtocolHandler(pseudonym, self.networkManager, self, masterip)
+        self.protocolHandler = ProtocolHandler(pseudonym, self.networkManager, self, masterip, mastername)
         if not isMaster:
             self.recieveThread.start()
         if self.debug:
@@ -32,14 +34,14 @@ class CommunicationManager:
             msg = self.networkManager.recv()
             if msg:  # Got new messages
                 self.protocolHandler.handle(msg, self.networkManager.addr[0])
-            time.sleep(0.2)
+            time.sleep(0.05)
 
     def handleNewRawMessage(self, messagetext, sender):
         self.protocolHandler.handle(messagetext, sender)
 
     def handleNewMessage(self, messagetext):
-        if self.debug:
-            print("[CommunicationManager.handleNewMessage] <{}> Did receive new message (\"{}\")".format(
+        # if self.debug:
+        print("[CommunicationManager.handleNewMessage] <{}> Did receive new message (\"{}\")".format(
             self.protocolHandler.pseudonym, messagetext))
 
     def sendMessage(self, message, receiver):
@@ -61,3 +63,4 @@ class CommunicationManager:
         if self.debug:
             print("[CommunicationManager.handleClockUpdate] <{}> Did receive clock update \"{}\")".format(
                 self.protocolHandler.pseudonym, clockupdate))
+

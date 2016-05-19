@@ -11,18 +11,21 @@ class ProtocolMessage:
 
 
 class ProtocolHandler:
-    debug = True
+    debug = False
     pseudonym = "BLA"
     masterip = "123.123.123.123"
+    masterpsd = "123.123.123.123"
     lookuptable = {}
     networtManager = object()
     communicationManager = object()
 
-    def __init__(self, pseudonym, networkManager, communicationManager, masterip=""):
+    def __init__(self, pseudonym, networkManager, communicationManager, masterip="", masterpsd=""):
         self.pseudonym = pseudonym
         self.networtManager = networkManager
         self.communicationManager = communicationManager
         self.masterip = masterip
+        self.masterpsd = masterpsd
+        self.lookuptable[masterpsd] = masterip
 
     # message = raw message
     # sender = ip address of sender of message
@@ -70,44 +73,50 @@ class ProtocolHandler:
 
     def handleMessage(self, message: ProtocolMessage):
         if self.debug:
-            print("[ProtocolManager.handleMessage] <{}> Recieved \"MESSAGE\"-Message \"".format(self.pseudonym) + str(
+            print("[ProtocolManager.handleMessage] <{}> Recieved \"MESSAGE\"-Message (in general) \"".format(
+                self.pseudonym) + str(
             message) + "\"")
         if message.m_to == self.pseudonym:
-            self.communicationManager.handleNewMessage(message)
+            self.communicationManager.handleNewMessage(message.m_content)
             return
         if message.m_to == "ALL":
             if self.debug:
-                print("[ProtocolManager.handleMessage] <{}> Recieved \"MESSAGE\"-Message for all \"".format(
-                self.pseudonym) + str(message) + "\"")
+                print("[ProtocolManager.handleMessage] <{}> Handling \"MESSAGE\"-Message for all \"".format(
+                    self.pseudonym) + str(message) + "\"")
                 print("[ProtocolManager.handleMessage] <{}> Current Lookup-Table: {}".format(self.pseudonym,
                                                                                              str(self.lookuptable)))
-            for reciever in self.lookuptable:
-                if not reciever == message.m_from:
-                    self.networtManager.send(self.lookuptable[reciever], str(
-                        ProtocolMessage(self.pseudonym, reciever, "MESSAGE", message.m_content)))
+            for client in self.lookuptable:
+                if not client == message.m_to and not client == self.masterpsd:
+                    self.networtManager.send(self.lookuptable[client], str(
+                        ProtocolMessage(message.m_from, client, "MESSAGE", message.m_content)))
             return
+        # Müll
         if message.m_to in self.lookuptable:
             self.networtManager.send(self.lookuptable[message.m_to],
-                                     str(ProtocolMessage(message.m_to, self.pseudonym, "MESSAGE", message.m_content)))
-            return
+                                     str(ProtocolMessage(message.m_from, message.m_to, "MESSAGE", message.m_content)))
 
     def sendMessage(self, message, receiver):
-        if self.debug:
-            print("[ProtocolHandler.sendMessage] <{}> Will send Message \"{}\" to \"{}\"".format(
-                self.pseudonym, message, receiver))
-
-        self.networtManager.send(self.masterip,
-                                 str(ProtocolMessage(self.pseudonym, receiver, "MESSAGE", message)))
+        print("[ProtocolManager.sendMessage] <{}> Redirecting to handleMessage...".format(self.pseudonym))
+        self.handleMessage(ProtocolMessage(self.pseudonym, receiver, "MESSAGE", message))
 
     def sendSubscribe(self, receiver):
+        if self.debug:
+            print("[ProtocolHandler.sendSubscribe] <{}> Will send Subscribe to \"{}\"".format(
+                self.pseudonym, receiver))
+
         self.networtManager.send(self.masterip, str(ProtocolMessage(self.pseudonym, receiver, "SUBSCRIBE", "")))
 
     def sendUnsubscribe(self, receiver):
-        self.networtManager.send(self.masterip, str(ProtocolMessage(self.pseudonym, receiver, "SUBSCRIBE", "")))
+        if self.debug:
+            print("[ProtocolHandler.sendUnsubscribe] <{}> Will send Unsubscribe to \"{}\"".format(
+                self.pseudonym, receiver))
+
+        self.networtManager.send(self.masterip, str(ProtocolMessage(self.pseudonym, receiver, "UNSUBSCRIBE", "")))
 
     def sendClockUpdate(self, receiver, clockupdate):
-        self.networtManager.send(self.masterip,
-                                 str(ProtocolMessage(self.pseudonym, receiver, "CLOCKUPDATE", clockupdate)))
+        if receiver in self.lookuptable:
+            self.networtManager.send(self.lookuptable[receiver],
+                                     str(ProtocolMessage(self.pseudonym, receiver, "CLOCKUPDATE", clockupdate)))
 
 # Beispiele für den ProtocolHandler
 # ph = ProtocolHandler("Mein Pseudonym", object(), object(), "MASTER", "123.123.123.123")

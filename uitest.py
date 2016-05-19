@@ -26,7 +26,7 @@ class UI_NavMain():
         topborder.create_text(225, 13, text=Con)
 
 class UI_NavMenu():
-    def Anzeigen(AktSeite : int, GesSeite : int , InfoText : str, Con : str):
+    def Anzeigen(root, AktSeite : int, GesSeite : int , InfoText : str, Con : str):
         back = Tk.Button(root, text = "<", command=root.quit, relief = "solid")
         back.pack()
         back.place(x=0, y=0, width=80, height=60)
@@ -98,18 +98,18 @@ class UI_NachrichtSchreiben():
         psend.pack()
         psend.place(x=260, y=180, width=60, height=60)
 
-root = Tk.Tk()
-
-w, h = root.winfo_screenwidth(), root.winfo_screenheight()
-root.overrideredirect(1)
-root.geometry("%dx%d+0+0" % (w, h))
-
-
-#UI_NachrichtSchreiben.Anzeigen(3, "Ja", "Nein", "Egal", "Ja!!!!")
-#UI_MainInfos.Anzeigen(3, "23:12:55")
-#UI_NachrichtenListe.Anzeigen(3, "Master", "Hallo Welt1", "Slave1", "Eintrag 2", "Slave2", "Eintrag3")
-#UI_NachrichtLesen.Anzeigen("Master", "Hallo Team! Ich hoffe ihr kommt mit eurem Projekt voran und wir sehen uns gleich.")
-
-UI_NavMain.Anzeigen("ok")
-
-root.mainloop()
+# root = Tk.Tk()
+#
+# w, h = root.winfo_screenwidth(), root.winfo_screenheight()
+# root.overrideredirect(1)
+# root.geometry("%dx%d+0+0" % (w, h))
+#
+#
+# #UI_NachrichtSchreiben.Anzeigen(3, "Ja", "Nein", "Egal", "Ja!!!!")
+# #UI_MainInfos.Anzeigen(3, "23:12:55")
+# #UI_NachrichtenListe.Anzeigen(3, "Master", "Hallo Welt1", "Slave1", "Eintrag 2", "Slave2", "Eintrag3")
+# #UI_NachrichtLesen.Anzeigen("Master", "Hallo Team! Ich hoffe ihr kommt mit eurem Projekt voran und wir sehen uns gleich.")
+#
+# UI_NavMain.Anzeigen("ok")
+#
+# root.mainloop()
